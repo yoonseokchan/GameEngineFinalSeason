@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 76036644}
   - component: {fileID: 76036647}
   - component: {fileID: 76036646}
+  - component: {fileID: 76036648}
   m_Layer: 0
   m_Name: Object
   m_TagString: Untagged
@@ -269,8 +270,8 @@ Tilemap:
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: 0, y: 0, z: 0}
-  m_Size: {x: 5, y: 6, z: 1}
+  m_Origin: {x: -11, y: 0, z: 0}
+  m_Size: {x: 21, y: 6, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -320,7 +321,7 @@ TilemapCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -355,6 +356,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 7
+--- !u!114 &76036648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76036642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c4922cfb4a3cb4e95e1dd4438da9df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageTrigger
+  stageScenePrefix: Stage_
 --- !u!1 &228334505
 GameObject:
   m_ObjectHideFlags: 0
@@ -5357,6 +5371,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 590a7f149dc646f48b575fd72bcf9bd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  playerHP: 100
+  playerAttack: 10
   moveSpeed: 1
   spriteUp:
   - {fileID: -4518853377557969270, guid: c2f34dad6dd35d04c82c5a61a0672659, type: 3}
@@ -5584,7 +5600,7 @@ Tilemap:
   m_GameObject: {fileID: 565793708}
   m_Enabled: 1
   m_Tiles:
-  - first: {x: -3, y: -1, z: 0}
+  - first: {x: 9, y: -2, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 0
@@ -5627,7 +5643,7 @@ Tilemap:
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -3, y: -2, z: 0}
-  m_Size: {x: 3, y: 4, z: 1}
+  m_Size: {x: 13, y: 4, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -5852,8 +5868,9 @@ GameObject:
   m_Component:
   - component: {fileID: 611002915}
   - component: {fileID: 611002914}
+  - component: {fileID: 611002916}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: GameSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5871,10 +5888,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46099189e8cbb894494aee421ca83743, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameDataManager
-  playerData:
-    collectedItems:
-    - 
-    stage: 1
+  gameSettingData: {fileID: 11400000, guid: f4d9b15563d220f4ba45e4c37090ae8c, type: 2}
+  saveData:
+    deathCount: 0
+  isTutorialFinished: 1
 --- !u!4 &611002915
 Transform:
   m_ObjectHideFlags: 0
@@ -5890,6 +5907,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &611002916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611002913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aad65d84f54705448b9330bf4c5277ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  titleSceneName: Title
+  gameSceneName: Stage1
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,8 +12,14 @@ EditorBuildSettings:
     path: Assets/Scenes/CharacterSelect.unity
     guid: 01119c33700565b4c9785a46e9989814
   - enabled: 1
-    path: Assets/Scenes/Stage1.unity
+    path: Assets/Scenes/MapSelect.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/Stage_3.unity
+    guid: 93c9f1066ed683b4b8928bd8a5e22c71
+  - enabled: 1
+    path: Assets/Scenes/Stage_2.unity
+    guid: 9459bb691dc4be6458fa42177f97c93a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
