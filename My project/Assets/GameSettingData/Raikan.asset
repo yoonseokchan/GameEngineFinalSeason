@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d59e1ec18bda124788b5a0d0eb43f70, type: 3}
+  m_Name: Raikan
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerEvolutionSO
+  evolutionName: Raikan
+  hpBonus: 50
+  attackBonus: 30
+  speedBonus: 10
+  spriteUp:
+  - {fileID: 7349422542728032697, guid: a02d0428cf29a9d46946c50da175a63b, type: 3}
+  - {fileID: 8867305974316606777, guid: 0e2f111f327c94445b4eedcde12b9c77, type: 3}
+  spriteDown:
+  - {fileID: -702541078575928967, guid: 7709e75a118fae14da428966c06c6e90, type: 3}
+  - {fileID: -6687782581787370304, guid: 3441772fdc4f1b64299f8e0d4fd882a9, type: 3}
+  spriteLeft:
+  - {fileID: -5309582712654113667, guid: bcbbcc3b5b02d4a488d76c1ae8ce99b0, type: 3}
+  - {fileID: -5897669707306498074, guid: 6ac54c6b7496fe84c8d63e387dfcea78, type: 3}
+  spriteRight:
+  - {fileID: -3019691197429073785, guid: 39c2b86828675e2478ac586597be663c, type: 3}
+  - {fileID: 950426285135314130, guid: e100cfbc826dd19478ae1df479ba8216, type: 3}
+  projectilePrefab: {fileID: 0}
+  attackCooldown: 4
+  projectileSpeed: 5
+  knockbackForce: 5

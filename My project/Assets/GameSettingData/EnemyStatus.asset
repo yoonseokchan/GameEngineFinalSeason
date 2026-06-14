@@ -15,3 +15,4 @@ MonoBehaviour:
   startHp: 100
   startAttack: 10
   EnemyrMoveSpeed: 0.5
+  expGemPrefab: {fileID: 8630808967059773753, guid: 8dd3621302b094349966c35917ac94ae, type: 3}

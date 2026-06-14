@@ -8,14 +8,10 @@ public class PlayerController : MonoBehaviour
     public int playerAttack = 0;
     public float moveSpeed = 1f;
 
-    [Header("Animation Sprites")]
-    public Sprite[] spriteUp;
-    public Sprite[] spriteDown;
-    public Sprite[] spriteLeft;
-    public Sprite[] spriteRight;
-    public float frameTime = 0.15f;
+    [Header("현재 진화 상태 정보")]
+    [SerializeField] private PlayerEvolutionSO currentEvolution; // 현재 내 진화 에셋
+    [SerializeField] private float frameTime = 0.15f;
 
-    // 내부 제어용 컴포넌트 및 변수
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Vector2 input;
@@ -24,91 +20,111 @@ public class PlayerController : MonoBehaviour
     private int frameIndex = 0;
     private float timer = 0f;
 
+    // 공격 관련 타이머 및 방향 기억
+    private float attackTimer = 0f;
+    private Vector2 lastMoveDirection = Vector2.down; // 기본 공격 방향은 아래
+
     private void Awake()
     {
-        // 1. 필수 컴포넌트 가져오기
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
 
-        // 2. 초기 스프라이트 방향 설정 (아래 방향)
-        currentSprites = spriteDown;
-        if (currentSprites != null && currentSprites.Length > 0)
+        // 최초 진화 정보 로드 및 능력치 세팅
+        if (currentEvolution != null)
         {
-            sr.sprite = currentSprites[0];
+            ApplyEvolution(currentEvolution);
         }
 
-        // 3. GameDataManager 싱글톤을 통한 로그라이트 능력치 연동
         if (GameDataManager.Instance != null)
         {
-            moveSpeed = GameDataManager.Instance.GetPlayerMoveSpeed();
-            playerHP = GameDataManager.Instance.GetPlayerHp();
-            playerAttack = GameDataManager.Instance.GetPlayerAttack();
-        }
-        else
-        {
-            Debug.LogWarning("GameDataManager 인스턴스를 찾을 수 없어 기본값으로 초기화합니다.");
+            moveSpeed += GameDataManager.Instance.GetPlayerMoveSpeed();
+            playerHP += GameDataManager.Instance.GetPlayerHp();
+            playerAttack += GameDataManager.Instance.GetPlayerAttack();
         }
     }
 
     private void Start()
     {
-        // 4. 튜토리얼 진행 유무 판정 로직 결합
-        if (GameDataManager.Instance != null)
+        if (GameDataManager.Instance != null && GameDataManager.Instance.isTutorialFinished == 0)
         {
-            if (GameDataManager.Instance.isTutorialFinished == 0)
-            {
-                // 튜토리얼 안 했을 경우 튜토리얼 오픈
-                Debug.Log("튜토리얼 오픈!");
-                GameDataManager.Instance.isTutorialFinished = 1;
-                // 필요하다면 여기에 튜토리얼 UI를 켜는 코드 추가
-            }
-            else
-            {
-                // 튜토리얼 했을 경우 아무것도 안 함
-                Debug.Log("이미 튜토리얼을 완료한 플레이어입니다.");
-            }
+            GameDataManager.Instance.isTutorialFinished = 1;
         }
     }
 
-    // New Input System의 Player Input 컴포넌트에서 호출되는 이동 이벤트 함수
+    // ?? 레벨업 창에서 새로운 진화 형태를 골랐을 때 실시간으로 호출해 줄 함수
+    public void ApplyEvolution(PlayerEvolutionSO newEvolution)
+    {
+        if (newEvolution == null) return;
+
+        currentEvolution = newEvolution;
+
+        // 능력치 반영 (기본 능력치 + 진화 보너스)
+        playerAttack = (GameDataManager.Instance != null ? GameDataManager.Instance.GetPlayerAttack() : 10) + currentEvolution.attackBonus;
+
+        // 무조건 현재 바라보던 방향 기준으로 애니메이션 교체되도록 강제 리셋
+        currentSprites = currentEvolution.spriteDown;
+        if (currentSprites != null && currentSprites.Length > 0) sr.sprite = currentSprites[0];
+
+        Debug.Log($"[{currentEvolution.evolutionName}] 형태로 변신 완료! 무기가 변경되었습니다.");
+    }
+
     public void OnMove(InputValue value)
     {
         input = value.Get<Vector2>();
         velocity = input.normalized * moveSpeed;
 
-        // 이동 입력이 들어왔을 때 방향에 맞는 스프라이트 배열로 교체
         if (input.sqrMagnitude > 0.01f)
         {
-            // 상하 방향보다 좌우 입력 값이 더 클 때 (좌우 이동 대각선 처리)
+            lastMoveDirection = input.normalized; // 마지막으로 움직인 방향 기억 (공격 방향용)
+
             if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
             {
-                if (input.x > 0)
-                {
-                    ChangeSprites(spriteRight);
-                }
-                else
-                {
-                    ChangeSprites(spriteLeft);
-                }
+                if (input.x > 0) ChangeSprites(currentEvolution.spriteRight);
+                else ChangeSprites(currentEvolution.spriteLeft);
             }
-            // 좌우 방향보다 상하 입력 값이 더 크거나 같을 때 (상하 이동)
             else
             {
-                if (input.y > 0)
-                {
-                    ChangeSprites(spriteUp);
-                }
-                else
-                {
-                    ChangeSprites(spriteDown);
-                }
+                if (input.y > 0) ChangeSprites(currentEvolution.spriteUp);
+                else ChangeSprites(currentEvolution.spriteDown);
             }
         }
     }
 
     private void Update()
     {
-        // 멈춰있을 때는 애니메이션을 재생하지 않고 0번째 프레임(정지 모션)으로 고정
+        HandleAnimation();
+        HandleAutoAttack(); // 매 프레임 공격 쿨타임 계산
+    }
+
+    private void HandleAutoAttack()
+    {
+        if (currentEvolution == null || currentEvolution.projectilePrefab == null) return;
+
+        attackTimer += Time.deltaTime;
+
+        // 현재 진화 형태에 설정된 쿨타임 주기에 도달하면 발사
+        if (attackTimer >= currentEvolution.attackCooldown)
+        {
+            FireProjectile();
+            attackTimer = 0f;
+        }
+    }
+
+    private void FireProjectile()
+    {
+        // 내 위치에 투사체 생성
+        GameObject projGo = Instantiate(currentEvolution.projectilePrefab, transform.position, Quaternion.identity);
+        Projectile projectile = projGo.GetComponent<Projectile>();
+
+        if (projectile != null)
+        {
+            // 투사체 스크립트에 대미지, 속도, 방향, 넉백 힘을 넘겨주어 발사시킵니다.
+            projectile.Setup(playerAttack, currentEvolution.projectileSpeed, lastMoveDirection, currentEvolution.knockbackForce);
+        }
+    }
+
+    private void HandleAnimation()
+    {
         if (input.sqrMagnitude <= 0.01f)
         {
             frameIndex = 0;
@@ -119,15 +135,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // 움직이고 있을 때 실시간 타이머 기반 애니메이션 프레임 전환
         timer += Time.deltaTime;
-
         if (timer >= frameTime)
         {
             timer = 0f;
             frameIndex++;
 
-            // 배열 크기를 벗어나면 첫 프레임으로 되돌림 (루프 재생)
             if (currentSprites != null && frameIndex >= currentSprites.Length)
             {
                 frameIndex = 0;
@@ -142,11 +155,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // 물리 기반의 안정적인 위치 이동 계산
         rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
     }
 
-    // 방향 전환 시 애니메이션 상태를 초기화해주는 함수
     private void ChangeSprites(Sprite[] newSprites)
     {
         if (currentSprites == newSprites || newSprites == null || newSprites.Length == 0)
@@ -158,19 +169,11 @@ public class PlayerController : MonoBehaviour
         sr.sprite = currentSprites[frameIndex];
     }
 
-    // 5. 적(Enemy) 충돌 및 게임오버 처리 로직 결합
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.GameOver();
-            }
-            else
-            {
-                Debug.LogError("GameManager 인스턴스를 찾을 수 없어 GameOver를 호출할 수 없습니다.");
-            }
+            if (GameManager.Instance != null) GameManager.Instance.GameOver();
         }
     }
 }
