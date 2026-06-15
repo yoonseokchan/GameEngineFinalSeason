@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9d4dfe2cddce594e9aa011168bc1677, type: 3}
   m_Name: EnemyStatus
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStatus
-  startHp: 100
+  startHp: 20
   startAttack: 10
   EnemyrMoveSpeed: 0.5
   expGemPrefab: {fileID: 8630808967059773753, guid: 8dd3621302b094349966c35917ac94ae, type: 3}

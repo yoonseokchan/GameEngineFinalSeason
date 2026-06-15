@@ -368,9 +368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0c4922cfb4a3cb4e95e1dd4438da9df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageTrigger
-  triggerMode: 1
-  targetSceneName: Level_1
-  nextStageNumber: 1
+  targetSceneName: GameStage
 --- !u!1 &228334505
 GameObject:
   m_ObjectHideFlags: 0
@@ -5373,22 +5371,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 590a7f149dc646f48b575fd72bcf9bd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  playerHP: 100
+  playerMaxHP: 100
+  playerCurrentHP: 100
   playerAttack: 10
-  moveSpeed: 1
-  spriteUp:
-  - {fileID: -4518853377557969270, guid: c2f34dad6dd35d04c82c5a61a0672659, type: 3}
-  - {fileID: -4388899747337525858, guid: ee67780a94c2d9646a2920f85688b408, type: 3}
-  spriteDown:
-  - {fileID: 8078897041468352302, guid: 8e24bc22f7a6b9d4b9b1ce62bad835b8, type: 3}
-  - {fileID: 6948402585382724860, guid: 9035aa74b70eee44f82b9647cbc54deb, type: 3}
-  spriteLeft:
-  - {fileID: 7475974851445736059, guid: ffa6b15ec593c754db2daf16f924d054, type: 3}
-  - {fileID: -3964654142196417474, guid: dd1792f499fd8bd4d896fe97eded2559, type: 3}
-  spriteRight:
-  - {fileID: 5327261893239730755, guid: d78776c3a10c9d44eb63d5aa66182523, type: 3}
-  - {fileID: -2431996629346840933, guid: f7b7886068645d14b9ee6693bd195a13, type: 3}
+  moveSpeed: 0.5
+  currentEvolution: {fileID: 11400000, guid: 18920f5a829f69b4c854f9281a7df158, type: 2}
   frameTime: 0.15
+  dmgCooldown: 0.5
 --- !u!212 &537293813
 SpriteRenderer:
   serializedVersion: 2
@@ -5602,7 +5591,7 @@ Tilemap:
   m_GameObject: {fileID: 565793708}
   m_Enabled: 1
   m_Tiles:
-  - first: {x: 9, y: -2, z: 0}
+  - first: {x: 10, y: -2, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 0
@@ -5645,7 +5634,7 @@ Tilemap:
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -3, y: -2, z: 0}
-  m_Size: {x: 13, y: 4, z: 1}
+  m_Size: {x: 14, y: 4, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -5870,7 +5859,6 @@ GameObject:
   m_Component:
   - component: {fileID: 611002915}
   - component: {fileID: 611002914}
-  - component: {fileID: 611002916}
   m_Layer: 0
   m_Name: GameSystem
   m_TagString: Untagged
@@ -5890,10 +5878,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46099189e8cbb894494aee421ca83743, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameDataManager
-  gameSettingData: {fileID: 11400000, guid: f4d9b15563d220f4ba45e4c37090ae8c, type: 2}
-  saveData:
-    deathCount: 0
-  isTutorialFinished: 1
+  isTutorialFinished: 0
+  playerMoveSpeed: 1
+  playerMaxHp: 100
+  playerAttack: 15
 --- !u!4 &611002915
 Transform:
   m_ObjectHideFlags: 0
@@ -5909,20 +5897,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &611002916
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 611002913}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aad65d84f54705448b9330bf4c5277ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  titleSceneName: Title
-  gameSceneName: Stage1
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -6020,7 +5994,7 @@ GameObject:
   - component: {fileID: 738091030}
   - component: {fileID: 738091029}
   - component: {fileID: 738091028}
-  - component: {fileID: 738091027}
+  - component: {fileID: 738091032}
   m_Layer: 0
   m_Name: Test
   m_TagString: Untagged
@@ -6043,20 +6017,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1075735353}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &738091027
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 738091025}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8218fe06dac79f149bf9bd4c82dab047, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GridStageTrigger
-  targetSceneName: 
-  targetTag: Player
 --- !u!19719996 &738091028
 TilemapCollider2D:
   m_ObjectHideFlags: 0
@@ -6187,16 +6147,6 @@ Tilemap:
   m_GameObject: {fileID: 738091025}
   m_Enabled: 1
   m_Tiles:
-  - first: {x: 0, y: 3, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   - first: {x: 7, y: 3, z: 0}
     second:
       serializedVersion: 2
@@ -6213,17 +6163,17 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 1a97d6227660f7a488e9ad2731824d3b, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {fileID: -6564198633328856824, guid: c7ed0b1e22311bb418eeea8edf96e4c8, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data:
       e00: 1
       e01: 0
@@ -6242,7 +6192,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -6268,6 +6218,19 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!114 &738091032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 738091025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c4922cfb4a3cb4e95e1dd4438da9df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageTrigger
+  targetSceneName: Test
 --- !u!1 &740325637
 GameObject:
   m_ObjectHideFlags: 0
@@ -6360,7 +6323,7 @@ GameObject:
   - component: {fileID: 989420622}
   - component: {fileID: 989420621}
   - component: {fileID: 989420620}
-  - component: {fileID: 989420619}
+  - component: {fileID: 989420624}
   m_Layer: 0
   m_Name: Library
   m_TagString: Untagged
@@ -6383,20 +6346,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1075735353}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &989420619
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 989420617}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8218fe06dac79f149bf9bd4c82dab047, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GridStageTrigger
-  targetSceneName: 
-  targetTag: Player
 --- !u!19719996 &989420620
 TilemapCollider2D:
   m_ObjectHideFlags: 0
@@ -6537,33 +6486,23 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
-  - first: {x: 0, y: 3, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 1a97d6227660f7a488e9ad2731824d3b, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {fileID: -6564198633328856824, guid: c7ed0b1e22311bb418eeea8edf96e4c8, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data:
       e00: 1
       e01: 0
@@ -6582,7 +6521,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -6608,6 +6547,19 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!114 &989420624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989420617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c4922cfb4a3cb4e95e1dd4438da9df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageTrigger
+  targetSceneName: Library
 --- !u!1 &1075735351
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d59e1ec18bda124788b5a0d0eb43f70, type: 3}
+  m_Name: Slime
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerEvolutionSO
+  evolutionName: Slime
+  hpBonus: 10
+  attackBonus: 10
+  speedBonus: 0.5
+  spriteUp:
+  - {fileID: 8078897041468352302, guid: 8e24bc22f7a6b9d4b9b1ce62bad835b8, type: 3}
+  - {fileID: 6948402585382724860, guid: 9035aa74b70eee44f82b9647cbc54deb, type: 3}
+  spriteDown:
+  - {fileID: -4518853377557969270, guid: c2f34dad6dd35d04c82c5a61a0672659, type: 3}
+  - {fileID: -4388899747337525858, guid: ee67780a94c2d9646a2920f85688b408, type: 3}
+  spriteLeft:
+  - {fileID: 7475974851445736059, guid: ffa6b15ec593c754db2daf16f924d054, type: 3}
+  - {fileID: -3964654142196417474, guid: dd1792f499fd8bd4d896fe97eded2559, type: 3}
+  spriteRight:
+  - {fileID: 5327261893239730755, guid: d78776c3a10c9d44eb63d5aa66182523, type: 3}
+  - {fileID: -2431996629346840933, guid: f7b7886068645d14b9ee6693bd195a13, type: 3}
+  projectilePrefab: {fileID: 8329346128140360687, guid: 1d47f9d32d8de53428d6bf83cfad780f, type: 3}
+  attackCooldown: 4
+  projectileSpeed: 3
+  knockbackForce: 1

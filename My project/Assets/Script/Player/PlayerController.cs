@@ -4,13 +4,19 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Stats")]
-    public int playerHP = 0;
+    public int playerMaxHP = 100;  
+    public int playerCurrentHP = 100;  
     public int playerAttack = 0;
     public float moveSpeed = 1f;
 
     [Header("현재 진화 상태 정보")]
-    [SerializeField] private PlayerEvolutionSO currentEvolution; // 현재 내 진화 에셋
+    [SerializeField] private PlayerEvolutionSO currentEvolution;
     [SerializeField] private float frameTime = 0.15f;
+
+    [Header("피격 내부 설정")]
+    [Tooltip("적과 닿았을 때 몇 초마다 대미지를 입을지 설정합니다.")]
+    [SerializeField] private float dmgCooldown = 0.5f;
+    private float dmgTimer = 0f;
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -20,48 +26,49 @@ public class PlayerController : MonoBehaviour
     private int frameIndex = 0;
     private float timer = 0f;
 
-    // 공격 관련 타이머 및 방향 기억
     private float attackTimer = 0f;
-    private Vector2 lastMoveDirection = Vector2.down; // 기본 공격 방향은 아래
+    private Vector2 lastMoveDirection = Vector2.down; 
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
 
-        // 최초 진화 정보 로드 및 능력치 세팅
         if (currentEvolution != null)
         {
             ApplyEvolution(currentEvolution);
         }
-
         if (GameDataManager.Instance != null)
         {
-            moveSpeed += GameDataManager.Instance.GetPlayerMoveSpeed();
-            playerHP += GameDataManager.Instance.GetPlayerHp();
-            playerAttack += GameDataManager.Instance.GetPlayerAttack();
+            moveSpeed = GameDataManager.Instance.GetPlayerMoveSpeed();
+            playerMaxHP = GameDataManager.Instance.GetPlayerHp();
+            playerAttack = GameDataManager.Instance.GetPlayerAttack();
+        }
+        else
+        {
+            moveSpeed = 1f;
+            playerMaxHP = 100;
+            playerAttack = 10;
+            Debug.LogWarning("GameDataManager를 찾을 수 없어 플레이어 능력치를 기본값으로 세팅합니다.");
         }
     }
 
     private void Start()
     {
-        if (GameDataManager.Instance != null && GameDataManager.Instance.isTutorialFinished == 0)
+        if (InGameUIManager.Instance != null)
         {
-            GameDataManager.Instance.isTutorialFinished = 1;
+            InGameUIManager.Instance.InitializeHPBar(playerMaxHP);
         }
     }
 
-    // ?? 레벨업 창에서 새로운 진화 형태를 골랐을 때 실시간으로 호출해 줄 함수
     public void ApplyEvolution(PlayerEvolutionSO newEvolution)
     {
         if (newEvolution == null) return;
 
         currentEvolution = newEvolution;
 
-        // 능력치 반영 (기본 능력치 + 진화 보너스)
         playerAttack = (GameDataManager.Instance != null ? GameDataManager.Instance.GetPlayerAttack() : 10) + currentEvolution.attackBonus;
 
-        // 무조건 현재 바라보던 방향 기준으로 애니메이션 교체되도록 강제 리셋
         currentSprites = currentEvolution.spriteDown;
         if (currentSprites != null && currentSprites.Length > 0) sr.sprite = currentSprites[0];
 
@@ -75,7 +82,7 @@ public class PlayerController : MonoBehaviour
 
         if (input.sqrMagnitude > 0.01f)
         {
-            lastMoveDirection = input.normalized; // 마지막으로 움직인 방향 기억 (공격 방향용)
+            lastMoveDirection = input.normalized; 
 
             if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
             {
@@ -93,7 +100,10 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         HandleAnimation();
-        HandleAutoAttack(); // 매 프레임 공격 쿨타임 계산
+        HandleAutoAttack();
+
+        if (dmgTimer > 0)
+            dmgTimer -= Time.deltaTime;
     }
 
     private void HandleAutoAttack()
@@ -102,7 +112,6 @@ public class PlayerController : MonoBehaviour
 
         attackTimer += Time.deltaTime;
 
-        // 현재 진화 형태에 설정된 쿨타임 주기에 도달하면 발사
         if (attackTimer >= currentEvolution.attackCooldown)
         {
             FireProjectile();
@@ -112,15 +121,42 @@ public class PlayerController : MonoBehaviour
 
     private void FireProjectile()
     {
-        // 내 위치에 투사체 생성
         GameObject projGo = Instantiate(currentEvolution.projectilePrefab, transform.position, Quaternion.identity);
         Projectile projectile = projGo.GetComponent<Projectile>();
 
         if (projectile != null)
         {
-            // 투사체 스크립트에 대미지, 속도, 방향, 넉백 힘을 넘겨주어 발사시킵니다.
-            projectile.Setup(playerAttack, currentEvolution.projectileSpeed, lastMoveDirection, currentEvolution.knockbackForce);
+            Vector2 targetDirection = GetDirectionToNearestEnemy();
+            projectile.Setup(playerAttack, currentEvolution.projectileSpeed, targetDirection, currentEvolution.knockbackForce);
         }
+    }
+
+    private Vector2 GetDirectionToNearestEnemy()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        if (enemies.Length == 0) return lastMoveDirection;
+
+        GameObject nearestEnemy = null;
+        float shortestDistance = Mathf.Infinity;
+        Vector2 currentPosition = transform.position;
+
+        foreach (GameObject enemy in enemies)
+        {
+            float distanceToEnemy = Vector3.Distance(currentPosition, enemy.transform.position);
+            if (distanceToEnemy < shortestDistance)
+            {
+                shortestDistance = distanceToEnemy;
+                nearestEnemy = enemy;
+            }
+        }
+
+        if (nearestEnemy != null)
+        {
+            return ((Vector2)nearestEnemy.transform.position - currentPosition).normalized;
+        }
+
+        return lastMoveDirection;
     }
 
     private void HandleAnimation()
@@ -169,11 +205,31 @@ public class PlayerController : MonoBehaviour
         sr.sprite = currentSprites[frameIndex];
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        
+        if (collision.CompareTag("Enemy") && dmgTimer <= 0f)
         {
-            if (GameManager.Instance != null) GameManager.Instance.GameOver();
+            int damageTaken = 15;
+
+            playerCurrentHP -= damageTaken;
+            dmgTimer = dmgCooldown; 
+
+            Debug.Log($"플레이어 피격 감지! 남은 체력: {playerCurrentHP}/{playerMaxHP}");
+
+            if (InGameUIManager.Instance != null)
+            {
+                InGameUIManager.Instance.UpdateHPBar(playerCurrentHP);
+            }
+
+            if (playerCurrentHP <= 0)
+            {
+                playerCurrentHP = 0;
+                if (InGameUIManager.Instance != null)
+                {
+                    InGameUIManager.Instance.TriggerGameOver();
+                }
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ MonoBehaviour:
   spriteRight:
   - {fileID: -3019691197429073785, guid: 39c2b86828675e2478ac586597be663c, type: 3}
   - {fileID: 950426285135314130, guid: e100cfbc826dd19478ae1df479ba8216, type: 3}
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 2504671515569021764, guid: 0e81894f0a3ea7a458bc5363835f19d5, type: 3}
   attackCooldown: 4
   projectileSpeed: 5
-  knockbackForce: 5
+  knockbackForce: 1

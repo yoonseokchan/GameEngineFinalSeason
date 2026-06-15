@@ -1,15 +1,20 @@
-using System.IO;
-using UnityEditor.Overlays;
 using UnityEngine;
+using System.IO; 
+
+[System.Serializable]
+public class SaveData
+{
+    public int isTutorialFinished;
+    public int currentStage;
+    public int bestScore;
+}
 
 public class GameDataManager : MonoBehaviour
 {
-    public static GameDataManager Instance;
-    public GameSettingData gameSettingData;
-    public SaveData saveData;
-    public int isTutorialFinished;
+    public static GameDataManager Instance { get; private set; }
 
-    private string savePath;
+    public int isTutorialFinished = 0;
+    private string saveFilePath;
 
     private void Awake()
     {
@@ -17,99 +22,58 @@ public class GameDataManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-
-            savePath = Application.persistentDataPath + "/saveData.json";
-
-            LoadJsonData();
-            LoadPlayerPrefs();
         }
         else
         {
-            Destroy(gameObject);
+            Destroy(gameObject); 
         }
+    }
+
+    public void SaveGameDataByJson()
+    {
+        SaveData data = new SaveData();
+        data.isTutorialFinished = this.isTutorialFinished;
+
+        string json = JsonUtility.ToJson(data, true);
+
+        File.WriteAllText(saveFilePath, json);
+        Debug.Log($"[JSON 세이브 완료] 저장 경로: {saveFilePath}");
+    }
+
+    public void LoadGameDataFromJson()
+    {
+        if (File.Exists(saveFilePath))
+        {
+            string json = File.ReadAllText(saveFilePath);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            this.isTutorialFinished = data.isTutorialFinished;
+            Debug.Log("[JSON 로드 완료] 이전 데이터를 성공적으로 불러왔습니다.");
+        }
+    }
+    public void SaveGameResult()
+    {
+        Debug.Log("GameDataManager: SaveGameResult 함수가 정상적으로 호출되었습니다.");
+    }
+
+    [Header("플레이어 기본 로그라이트 능력치")]
+    [SerializeField] private float playerMoveSpeed = 3f;
+    [SerializeField] private int playerMaxHp = 100;
+    [SerializeField] private int playerAttack = 15;
+
+    public float GetPlayerMoveSpeed()
+    {
+        return playerMoveSpeed;
     }
 
     public int GetPlayerHp()
     {
-        int baseHp = gameSettingData.startHp;
-        int bonusHp = gameSettingData.hpBonusPerDeath;
-
-        return baseHp + bonusHp * saveData.deathCount;
+        return playerMaxHp;
     }
+
 
     public int GetPlayerAttack()
     {
-        int baseAttack = gameSettingData.startAttack;
-        int bonusAttack = gameSettingData.atkBonusPerDeath;
-        return baseAttack + bonusAttack * saveData.deathCount;
-    }
-
-    public float GetPlayerMoveSpeed()
-    {
-        return gameSettingData.playerMoveSpeed;
-    }
-
-    public void SaveGameResult()
-    {
-        saveData.deathCount++;
-
-        SaveJsonData();
-    }
-
-    public void SaveJsonData()
-    {
-        string json = JsonUtility.ToJson(saveData, true);
-        File.WriteAllText(savePath, json);
-
-        Debug.Log("JSON 저장 완료: " + savePath);
-    }
-
-    public void LoadJsonData()
-    {
-        if (File.Exists(savePath))
-        {
-            string json = File.ReadAllText(savePath);
-            saveData = JsonUtility.FromJson<SaveData>(json);
-        }
-        else
-        {
-            saveData = new SaveData();
-            SaveJsonData();
-        }
-    }
-
-    public void DeleteJsonData()
-    {
-        if (File.Exists(savePath))
-        {
-            File.Delete(savePath);
-        }
-
-        saveData = new SaveData();
-        SaveJsonData();
-
-        Debug.Log("JSON 저장 데이터 삭제");
-    }
-
-    public void LoadPlayerPrefs()
-    {
-        isTutorialFinished = PlayerPrefs.GetInt("TUTORIAL", 0);
-    }
-
-    public void SavePlayerPrefs()
-    {
-        PlayerPrefs.SetInt("TUTORIAL", isTutorialFinished);
-        PlayerPrefs.Save();
-
-        Debug.Log("PlayerPrefs 저장 완료");
-    }
-
-    public void DeletePlayerPrefs()
-    {
-        // 튜토리얼 유무 정보 삭제하고 싶을때 해당 함수 사용
-        PlayerPrefs.DeleteKey("TUTORIAL");
-        LoadPlayerPrefs();
-
-        Debug.Log("PlayerPrefs 삭제 완료");
+        return playerAttack;
     }
 }
