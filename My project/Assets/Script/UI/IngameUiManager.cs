@@ -1,25 +1,28 @@
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.UI;
+using TMPro; 
 
 public class InGameUIManager : MonoBehaviour
 {
     public static InGameUIManager Instance { get; private set; }
 
-    [Header("게임오버 UI 설정 (하이러키 내 오브젝트)")]
+    [Header("게임오버 UI 설정")]
     [SerializeField] private GameObject gameOverPanel;
 
+    [Header("점수(Score) UI 설정")]
+    [SerializeField] private TextMeshProUGUI scoreText;
+
     [Header("체력 시각화 UI")]
-    [Tooltip("UI의 Slider 컴포넌트를 연결하세요.")]
     [SerializeField] private Slider hpSlider;
 
-    [Tooltip("피격 시 화면이 순간 붉게 변할 UI Image 패널을 연결하세요.")]
+    [Tooltip("피격 시 화면이 순간 붉게 변할 UI")]
     [SerializeField] private Image damageFlashImage;
     [SerializeField] private float flashSpeed = 5f;
     private bool isFlashing = false;
 
-    [Header("사운드 설정")]
-    [SerializeField] private AudioSource bgmAudioSource; 
-    [SerializeField] private AudioClip gameOverBgm;     
+    [Header("사운드")]
+    [SerializeField] private AudioSource bgmAudioSource;
+    [SerializeField] private AudioClip gameOverBgm;
 
     private void Awake()
     {
@@ -31,6 +34,9 @@ public class InGameUIManager : MonoBehaviour
     {
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (damageFlashImage != null) damageFlashImage.color = Color.clear;
+
+        // 게임 시작 시 점수를 0으로 초기화
+        UpdateScoreUI(0);
     }
 
     private void Update()
@@ -43,6 +49,13 @@ public class InGameUIManager : MonoBehaviour
                 damageFlashImage.color = Color.clear;
                 isFlashing = false;
             }
+        }
+    }
+    public void UpdateScoreUI(int currentScore)
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = $"Score : {currentScore}";
         }
     }
 
@@ -75,17 +88,13 @@ public class InGameUIManager : MonoBehaviour
         {
             gameOverPanel.SetActive(true);
         }
-
-        // 2. BGM 전환 로직
         if (bgmAudioSource != null && gameOverBgm != null)
         {
-            bgmAudioSource.Stop();              
-            bgmAudioSource.clip = gameOverBgm; 
-            bgmAudioSource.loop = false;       
-            bgmAudioSource.Play();            
+            bgmAudioSource.Stop();
+            bgmAudioSource.clip = gameOverBgm;
+            bgmAudioSource.loop = false;
+            bgmAudioSource.Play();
         }
-
-        // 3. 게임 플레이 정지
         Time.timeScale = 0f;
         Debug.Log("게임 오버! 패널 오픈 및 BGM이 전환되었습니다.");
     }

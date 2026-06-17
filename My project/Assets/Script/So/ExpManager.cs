@@ -1,89 +1,91 @@
 using UnityEngine;
-using TMPro; // 점수를 화면에 그리기 위한 TextMeshPro UI 네임스페이스
+using System.Collections.Generic; 
 
 public class PlayerExpManager : MonoBehaviour
 {
     public static PlayerExpManager Instance { get; private set; }
 
-    [Header("레벨업 UI 패널")]
+    [Header("실시간 플레이어 레벨 및 경험치 데이터")]
+    public int currentLevel = 1;
+    public int currentExp = 0;
+    public int maxExp = 100;
+
+    [Header("레벨업 UI 패널 설정")]
     [SerializeField] private GameObject levelUpPanel;
 
-    [Header("인게임 UI 텍스트 연결")]
-    [Tooltip("현재 획득한 점수를 실시간으로 띄워줄 TextMeshPro - Text 오브젝트를 연결하세요.")]
-    [SerializeField] private TextMeshProUGUI scoreText;
+    [Tooltip("하이러키 창에 있는 3개의 카드 버튼 오브젝트를 순서대로 넣어주세요.")]
+    [SerializeField] private LevelUpButton[] optionButtons;
 
-    [Header("경험치 및 점수 시스템")]
-    [SerializeField] private int currentExp = 0;
-    [SerializeField] private int maxExp = 100;
-    [SerializeField] private int currentLevel = 1;
-
-    // 현재 한 판당 실시간으로 올라가는 점수
-    private int currentScore = 0;
+    [Header("전체 진화 데이터 리스트")]
+    [Tooltip("게임에 존재하는 모든 PlayerEvolutionSO 에셋들을 여기에 전부 등록하세요.")]
+    [SerializeField] private List<PlayerEvolutionSO> allEvolutions = new List<PlayerEvolutionSO>();
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()
     {
         if (levelUpPanel != null) levelUpPanel.SetActive(false);
-
-        // 게임 시작 시 점수 초기화 및 UI 텍스트 업데이트
-        currentScore = 0;
-        UpdateScoreUI();
-
-        // 참고: 새로 시작할 때 이전 판 점수를 날리기 위해 초기화합니다.
-        // 최고 기록 저장은 아래 SaveCurrentScoreToTotal() 에서 처리합니다.
-        PlayerPrefs.SetInt("LastMatchScore", 0);
-        PlayerPrefs.Save();
     }
-
-    public void AddExperience(int expAmount, int scoreAmount)
+    public void AddExperience(int amount)
     {
-        currentExp += expAmount;
-        if (currentExp >= maxExp)
+        currentExp += amount;
+        Debug.Log($"경험치 획득: +{amount} (현재: {currentExp}/{maxExp})");
+
+        // 경험치가 가득 차면 레벨업 루프 가동
+        while (currentExp >= maxExp)
         {
             LevelUp();
         }
-
-        currentScore += scoreAmount;
-        UpdateScoreUI();
-
-        PlayerPrefs.SetInt("LastMatchScore", currentScore);
-
-
-        int bestScore = PlayerPrefs.GetInt("BestScore", 0);
-        if (currentScore > bestScore)
-        {
-            PlayerPrefs.SetInt("BestScore", currentScore);
-        }
-
-        PlayerPrefs.Save(); 
     }
-
-    private void UpdateScoreUI()
-    {
-        if (scoreText != null)
-        {
-            scoreText.text = $"Score : {currentScore}";
-        }
-    }
-
     private void LevelUp()
     {
         currentLevel++;
         currentExp -= maxExp;
-        maxExp = Mathf.RoundToInt(maxExp * 1.2f);
+        maxExp = Mathf.RoundToInt(maxExp * 1.3f);
 
+        Debug.Log($"★ 레벨업 달성! 현재 레벨: {currentLevel} ★");
+        if (GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.SaveGameResult();
+        }
+
+        RefreshLevelUpOptions();
+        // 시간을 멈추고 화면에 선택 창을 띄움
         if (levelUpPanel != null)
         {
             levelUpPanel.SetActive(true);
             Time.timeScale = 0f;
         }
     }
+    private void RefreshLevelUpOptions()
+    {
+        if (allEvolutions.Count == 0 || optionButtons == null || optionButtons.Length < 3) return;
 
+        List<PlayerEvolutionSO> tempList = new List<PlayerEvolutionSO>(allEvolutions);
+        for (int i = 0; i < optionButtons.Length; i++)
+        {
+            if (tempList.Count == 0) break;
+
+            int randomIndex = Random.Range(0, tempList.Count);
+            PlayerEvolutionSO chosenEvolution = tempList[randomIndex];
+
+            if (optionButtons[i] != null)
+            {
+                optionButtons[i].SetupButton(chosenEvolution);
+            }
+            tempList.RemoveAt(randomIndex);
+        }
+    }
     public void CloseLevelUpPanel()
     {
         if (levelUpPanel != null)
