@@ -7307,7 +7307,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 2217e23faaa2b7247be00f3cba0d9129, type: 3}
+  m_Texture: {fileID: 2800000, guid: f60a543408876da44be6358c1e235c1b, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -7802,7 +7802,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46099189e8cbb894494aee421ca83743, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameDataManager
-  isTutorialFinished: 0
+  currentScore: 0
   playerMoveSpeed: 1
   playerMaxHp: 100
   playerAttack: 15
@@ -9768,8 +9768,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2136031658}
   - {fileID: 1880562334}
+  - {fileID: 2136031658}
   - {fileID: 765191193}
   m_Father: {fileID: 1616708747}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

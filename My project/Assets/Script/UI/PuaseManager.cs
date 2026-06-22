@@ -72,8 +72,8 @@ public class PauseAndGameOverManager : MonoBehaviour
         PlayerPrefs.SetInt("LastMatchScore", 0);
         PlayerPrefs.Save();
 
-        Debug.Log("인게임 데이터를 저장하지 않고 타이틀 화면으로 복귀합니다.");
-        SceneManager.LoadScene("Title"); 
+        Debug.Log("인게임 데이터를 저장하지 않고 타이틀 화면으로.");
+        SceneManager.LoadScene("MapSelect"); 
     }
 
     public void OpenOptions()
@@ -86,5 +86,9 @@ public class PauseAndGameOverManager : MonoBehaviour
     {
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (pausePanel != null) pausePanel.SetActive(true); // 다시 일시중단 메뉴 패널 
+    }
+    public void Title()
+    {
+        SceneManager.LoadScene("MapSelect");
     }
 }
