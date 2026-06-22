@@ -12,23 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d59e1ec18bda124788b5a0d0eb43f70, type: 3}
   m_Name: Giant
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEvolutionSO
-  evolutionName: Raikan
+  evolutionName: Giant
   hpBonus: 100
-  attackBonus: 50
-  speedBonus: -10
+  attackBonus: 100
+  speedBonus: -2
   spriteUp:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: -6720614374537327684, guid: e3404cccbba07d24cabe2661100df07d, type: 3}
+  - {fileID: -6102723603575992560, guid: 0bd5a981519e048409851f3be4302a9d, type: 3}
   spriteDown:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: -4721599822013277629, guid: a7b097832bd106143a69a33894bfb3c1, type: 3}
+  - {fileID: 7943141347140965819, guid: 293e8bf76722cbf438c57e59f61cf5c2, type: 3}
   spriteLeft:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: -2889525426127768418, guid: f54ced34e31980c4e8dbc6d28976640d, type: 3}
+  - {fileID: 4280154723629138478, guid: 3d2b7e4ebc38a4241bbc7cdf52b4520f, type: 3}
   spriteRight:
-  - {fileID: 0}
-  - {fileID: 0}
-  projectilePrefab: {fileID: 0}
-  attackCooldown: 5
-  projectileSpeed: 5
+  - {fileID: 163520329173332639, guid: 931602a453bdd264a84da8cb147a0cb0, type: 3}
+  - {fileID: -5733752648270189978, guid: cb1e65a8f78deca498ec0469fd9dd16b, type: 3}
+  projectilePrefab: {fileID: 2504671515569021764, guid: eacb49a2e87dd07429af2dc546de12a1, type: 3}
+  attackCooldown: 6
+  projectileSpeed: 4
   knockbackForce: 5

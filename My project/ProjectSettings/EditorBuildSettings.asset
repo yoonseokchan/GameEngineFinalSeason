@@ -9,9 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Title.unity
     guid: a0289c846c7a9444a906f5100f27737b
   - enabled: 1
-    path: Assets/Scenes/CharacterSelect.unity
-    guid: 01119c33700565b4c9785a46e9989814
-  - enabled: 1
     path: Assets/Scenes/MapSelect.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
@@ -20,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Library.unity
     guid: 9459bb691dc4be6458fa42177f97c93a
+  - enabled: 1
+    path: Assets/Scenes/Test.unity
+    guid: 91955b06fcb36ca40bd8b356225b8354
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

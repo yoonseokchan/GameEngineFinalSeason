@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d59e1ec18bda124788b5a0d0eb43f70, type: 3}
   m_Name: Snake
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEvolutionSO
-  evolutionName: Raikan
+  evolutionName: Snake
   hpBonus: 20
   attackBonus: 50
   speedBonus: 5

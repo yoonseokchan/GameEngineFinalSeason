@@ -112,4 +112,15 @@ public class TitleManager : MonoBehaviour
             sfxSlider.onValueChanged.AddListener(SetSFXVolume);
         }
     }
+    public void QuitGame()
+    {
+        Debug.Log("게임 종료 버튼이 클릭되었습니다. 어플리케이션을 닫습니다.");
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        // 2. 실제 PC나 모바일 등으로 빌드된 게임 파일에서 프로그램을 완전히 종료합니다.
+        Application.Quit();
+#endif
+    }
 }

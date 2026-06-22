@@ -89,6 +89,6 @@ public class PauseAndGameOverManager : MonoBehaviour
     }
     public void Title()
     {
-        SceneManager.LoadScene("MapSelect");
+        SceneManager.LoadScene("Title");
     }
 }
