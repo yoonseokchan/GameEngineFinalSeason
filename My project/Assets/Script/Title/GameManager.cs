@@ -25,12 +25,6 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(gameSceneName);
     }
 
-    public void GameOver()
-    {
-        GameDataManager.Instance.SaveGameResult();
-        GoTitle();
-    }
-
     public void GoTitle()
     {
         SceneManager.LoadScene(titleSceneName);

@@ -13,9 +13,6 @@ MonoBehaviour:
   m_Name: Raikan
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEvolutionSO
   evolutionName: Raikan
-  hpBonus: 50
-  attackBonus: 30
-  speedBonus: 10
   spriteUp:
   - {fileID: 7349422542728032697, guid: a02d0428cf29a9d46946c50da175a63b, type: 3}
   - {fileID: 8867305974316606777, guid: 0e2f111f327c94445b4eedcde12b9c77, type: 3}
@@ -28,7 +25,10 @@ MonoBehaviour:
   spriteRight:
   - {fileID: -3019691197429073785, guid: 39c2b86828675e2478ac586597be663c, type: 3}
   - {fileID: 950426285135314130, guid: e100cfbc826dd19478ae1df479ba8216, type: 3}
-  projectilePrefab: {fileID: 2504671515569021764, guid: 0e81894f0a3ea7a458bc5363835f19d5, type: 3}
+  attackBonus: 30
   attackCooldown: 4
+  projectilePrefab: {fileID: 2504671515569021764, guid: 0e81894f0a3ea7a458bc5363835f19d5, type: 3}
   projectileSpeed: 5
   knockbackForce: 1
+  nextEvolutions:
+  - {fileID: 11400000, guid: 4c724ae0137a4a1438774ca8c731db2e, type: 2}

@@ -8,15 +8,12 @@ public class LevelUpController : MonoBehaviour
 
     void Start()
     {
-        // 씬에 배치되거나 스폰될 때, 기본적으로 패널 UI 자체는 숨겨둡니다.
-        // (주의: 프리팹에 연결할 때는 씬에 상주하는 Canvas 내의 패널을 연결해야 합니다.)
         if (levelUpPanel != null)
         {
             levelUpPanel.SetActive(false);
         }
         else
         {
-            // 프리팹 인스펙터에서 직접 연결하기 어렵다면 씬에서 태그나 이름으로 찾을 수도 있습니다.
             levelUpPanel = GameObject.FindWithTag("LevelUpPanel");
         }
     }

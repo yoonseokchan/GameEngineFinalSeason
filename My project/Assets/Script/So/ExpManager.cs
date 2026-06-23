@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 
 public class PlayerExpManager : MonoBehaviour
 {
@@ -13,40 +13,35 @@ public class PlayerExpManager : MonoBehaviour
     [Header("레벨업 UI 패널 설정")]
     [SerializeField] private GameObject levelUpPanel;
 
-    [Tooltip("하이러키 창에 있는 3개의 카드 버튼 오브젝트를 순서대로 넣어주세요.")]
+    [Tooltip("하이러키 창에 있는 3개의 카드 버튼 오브젝트를 순서대로 넣어주세요. (왼쪽/가운데/오른쪽 등)")]
     [SerializeField] private LevelUpButton[] optionButtons;
 
-    [Header("전체 진화 데이터 리스트")]
-    [Tooltip("게임에 존재하는 모든 PlayerEvolutionSO 에셋들을 여기에 전부 등록하세요.")]
-    [SerializeField] private List<PlayerEvolutionSO> allEvolutions = new List<PlayerEvolutionSO>();
+    [Header("최초/기본 진화 데이터 리스트")]
+    [Tooltip("최초 레벨 1 플레이어 상태에서 등장할 수 있는 기본 진화 풀입니다. 등록된 순서대로 버튼에 고정 배치됩니다.")]
+    [SerializeField] private List<PlayerEvolutionSO> baseEvolutions = new List<PlayerEvolutionSO>();
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     private void Start()
     {
         if (levelUpPanel != null) levelUpPanel.SetActive(false);
     }
+
     public void AddExperience(int amount)
     {
         currentExp += amount;
         Debug.Log($"경험치 획득: +{amount} (현재: {currentExp}/{maxExp})");
 
-        // 경험치가 가득 차면 레벨업 루프 가동
         while (currentExp >= maxExp)
         {
             LevelUp();
         }
     }
+
     private void LevelUp()
     {
         currentLevel++;
@@ -56,11 +51,10 @@ public class PlayerExpManager : MonoBehaviour
         Debug.Log($"★ 레벨업 달성! 현재 레벨: {currentLevel} ★");
         if (GameDataManager.Instance != null)
         {
-            GameDataManager.Instance.SaveGameResult();
+            GameDataManager.Instance.SaveGameData();
         }
-
         RefreshLevelUpOptions();
-        // 시간을 멈추고 화면에 선택 창을 띄움
+
         if (levelUpPanel != null)
         {
             levelUpPanel.SetActive(true);
@@ -69,23 +63,44 @@ public class PlayerExpManager : MonoBehaviour
     }
     private void RefreshLevelUpOptions()
     {
-        if (allEvolutions.Count == 0 || optionButtons == null || optionButtons.Length < 3) return;
+        if (optionButtons == null || optionButtons.Length == 0) return;
+        GameObject player = GameObject.FindWithTag("Player");
+        PlayerEvolutionSO currentEvolution = null;
 
-        List<PlayerEvolutionSO> tempList = new List<PlayerEvolutionSO>(allEvolutions);
+        if (player != null)
+        {
+            PlayerController playerCtrl = player.GetComponent<PlayerController>();
+            if (playerCtrl != null)
+            {
+                currentEvolution = playerCtrl.currentEvolution;
+            }
+        }
+        List<PlayerEvolutionSO> availablePool = new List<PlayerEvolutionSO>();
+
+        if (currentEvolution != null && currentEvolution.nextEvolutions != null && currentEvolution.nextEvolutions.Count > 0)
+        {
+            availablePool = new List<PlayerEvolutionSO>(currentEvolution.nextEvolutions);
+        }
+        else
+        {
+            if (baseEvolutions.Count == 0) return;
+            availablePool = new List<PlayerEvolutionSO>(baseEvolutions);
+        }
         for (int i = 0; i < optionButtons.Length; i++)
         {
-            if (tempList.Count == 0) break;
-
-            int randomIndex = Random.Range(0, tempList.Count);
-            PlayerEvolutionSO chosenEvolution = tempList[randomIndex];
-
-            if (optionButtons[i] != null)
+            if (optionButtons[i] == null) continue;
+            if (i >= availablePool.Count)
             {
-                optionButtons[i].SetupButton(chosenEvolution);
+                optionButtons[i].gameObject.SetActive(false);
+                continue;
             }
-            tempList.RemoveAt(randomIndex);
+            optionButtons[i].gameObject.SetActive(true);
+
+            PlayerEvolutionSO assignedEvolution = availablePool[i];
+            optionButtons[i].SetupButton(assignedEvolution);
         }
     }
+
     public void CloseLevelUpPanel()
     {
         if (levelUpPanel != null)

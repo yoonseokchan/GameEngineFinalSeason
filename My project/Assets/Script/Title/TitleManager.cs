@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Audio;
+using TMPro;
 
 public class TitleManager : MonoBehaviour
 {
@@ -9,8 +10,9 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private string nextSceneName = "GameScene";
 
     [Header("UI Panels")]
-    [SerializeField] private GameObject settingsPanel; 
-    [SerializeField] private GameObject scorePanel;   
+    [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private GameObject scorePanel;
+    [SerializeField] private TextMeshProUGUI highScoreText;
 
     [Header("Audio Mixer")]
     [SerializeField] private AudioMixer audioMixer;
@@ -37,6 +39,12 @@ public class TitleManager : MonoBehaviour
     public void StartGame()
     {
         PlaySFX();
+
+        if (GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.StartNewGameRun();
+        }
+
         SceneManager.LoadScene(nextSceneName);
     }
 
@@ -58,12 +66,20 @@ public class TitleManager : MonoBehaviour
     {
         PlaySFX();
         if (scorePanel != null)
+        {
             scorePanel.SetActive(true);
+
+            if (GameDataManager.Instance != null && highScoreText != null)
+            {
+                int bestScore = GameDataManager.Instance.GetHighScore();
+                highScoreText.text = $"최고 기록 : {bestScore} 점";
+            }
+        }
     }
 
     public void CloseScorePanel()
     {
-        PlaySFX(); 
+        PlaySFX();
         if (scorePanel != null)
             scorePanel.SetActive(false);
     }
@@ -112,14 +128,19 @@ public class TitleManager : MonoBehaviour
             sfxSlider.onValueChanged.AddListener(SetSFXVolume);
         }
     }
+
     public void QuitGame()
     {
-        Debug.Log("게임 종료 버튼이 클릭되었습니다. 어플리케이션을 닫습니다.");
+        Debug.Log("도감 데이터를 초기화한 후 아카식 에고즈 프로그램을 안전하게 종료합니다.");
+        if (GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.ClearLibrary();   
+            GameDataManager.Instance.SaveGameData();   
+        }
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-        // 2. 실제 PC나 모바일 등으로 빌드된 게임 파일에서 프로그램을 완전히 종료합니다.
         Application.Quit();
 #endif
     }

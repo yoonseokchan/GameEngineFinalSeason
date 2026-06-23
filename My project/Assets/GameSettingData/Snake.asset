@@ -13,22 +13,22 @@ MonoBehaviour:
   m_Name: Snake
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEvolutionSO
   evolutionName: Snake
-  hpBonus: 20
-  attackBonus: 50
-  speedBonus: 5
   spriteUp:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 5931842347579807508, guid: f60a543408876da44be6358c1e235c1b, type: 3}
+  - {fileID: -7143692724702679029, guid: efe072071d1b1fe4899875ce8de71455, type: 3}
   spriteDown:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: -8187829438515944275, guid: 645a7b45c5c9f75439002f7592c068ed, type: 3}
+  - {fileID: 1697046585306783127, guid: 30d3d1c512e08a04db6cb1b21b89f183, type: 3}
   spriteLeft:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: -8276484408669256778, guid: 8f8b389fc5a559b4692ddf43bfaea711, type: 3}
+  - {fileID: -8414646570100245437, guid: eeff2ff5fe7e5b943a7a7a4a23859cec, type: 3}
   spriteRight:
-  - {fileID: 0}
-  - {fileID: 0}
-  projectilePrefab: {fileID: 0}
+  - {fileID: 4137047906090897953, guid: 63adbabb246d9d44dab2b6c0e76f50f6, type: 3}
+  - {fileID: -1402223475383073668, guid: b888f8c97d549194d89cfbd039222a70, type: 3}
+  attackBonus: 50
   attackCooldown: 3
+  projectilePrefab: {fileID: 2504671515569021764, guid: eacb49a2e87dd07429af2dc546de12a1, type: 3}
   projectileSpeed: 5
   knockbackForce: 5
+  nextEvolutions:
+  - {fileID: 11400000, guid: 5eac9a3261fb733479ef6eecefb5a757, type: 2}

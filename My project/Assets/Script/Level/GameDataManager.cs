@@ -1,74 +1,137 @@
 using UnityEngine;
+using System.IO;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class SaveData
+{
+    public int savedScore;
+    public int savedHighScore;
+    public int savedMaxHp;
+    public int savedAttack;
+    public List<string> unlockedEvolutions = new List<string>();
+}
 
 public class GameDataManager : MonoBehaviour
 {
     public static GameDataManager Instance { get; private set; }
 
-    [Header("실시간 점수 데이터")]
+    [Header("영구 보존 재화 및 능력치")]
     [SerializeField] private int currentScore = 0;
-
-    [Header("플레이어 기본 로그라이트 능력치")]
+    [SerializeField] private int highScore = 0;
     [SerializeField] private float playerMoveSpeed = 3f;
     [SerializeField] private int playerMaxHp = 100;
     [SerializeField] private int playerAttack = 15;
+
+    public List<string> unlockedEvolutions = new List<string>();
+    private string saveFilePath;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); 
-            Debug.Log("GameDataManager: 최초 인스턴스가 성공적으로 생성되었으며 파괴 방지 설정되었습니다.");
+            DontDestroyOnLoad(gameObject);
+            saveFilePath = Application.persistentDataPath + "/playerSaveData.json";
+            LoadGameData();
         }
         else if (Instance != this)
         {
-            Debug.Log($"GameDataManager: 중복된 매니저 오브젝트({gameObject.name})를 파괴하여 싱글톤을 유지합니다.");
             Destroy(gameObject);
         }
     }
 
-    public void ResetScore()
+    public void StartNewGameRun()
     {
         currentScore = 0;
-        if (InGameUIManager.Instance != null)
-        {
-            InGameUIManager.Instance.UpdateScoreUI(currentScore);
-        }
+        playerMaxHp = 100;
+        playerAttack = 15;
+
+        SaveGameData();
+        Debug.Log("[알림] 새 게임 런 가동: 현재 점수 및 강화 능력치가 완전 초기화되었습니다.");
+    }
+
+    public void ResetScore()
+    {
+        if (InGameUIManager.Instance != null) InGameUIManager.Instance.UpdateScoreUI(currentScore);
     }
 
     public void AddScore(int amount)
     {
         currentScore += amount;
-        Debug.Log($"[DataManager] 점수 획득! +{amount} (현재 총 점수: {currentScore})");
 
-        if (InGameUIManager.Instance != null)
+        if (currentScore > highScore)
         {
-            InGameUIManager.Instance.UpdateScoreUI(currentScore);
+            highScore = currentScore;
+        }
+
+        if (InGameUIManager.Instance != null) InGameUIManager.Instance.UpdateScoreUI(currentScore);
+        SaveGameData();
+    }
+
+    public int GetCurrentScore() { return currentScore; }
+    public int GetHighScore() { return highScore; }
+    public float GetPlayerMoveSpeed() { return playerMoveSpeed; }
+    public int GetPlayerHp() { return playerMaxHp; }
+    public int GetPlayerAttack() { return playerAttack; }
+
+    public bool SpendScore(int cost)
+    {
+        if (currentScore >= cost)
+        {
+            currentScore -= cost;
+            if (InGameUIManager.Instance != null) InGameUIManager.Instance.UpdateScoreUI(currentScore);
+            SaveGameData();
+            return true;
+        }
+        return false;
+    }
+
+    public void AddBaseHp(int amount) { playerMaxHp += amount; SaveGameData(); }
+    public void AddBaseAttack(int amount) { playerAttack += amount; SaveGameData(); }
+
+    public void UnlockEvolution(string evoName)
+    {
+        if (!string.IsNullOrEmpty(evoName) && !unlockedEvolutions.Contains(evoName))
+        {
+            unlockedEvolutions.Add(evoName);
+            SaveGameData();
         }
     }
 
-    public int GetCurrentScore()
+    public bool IsUnlocked(string evoName) { return unlockedEvolutions.Contains(evoName); }
+    public void ClearLibrary()
     {
-        return currentScore;
+        unlockedEvolutions.Clear();
+        Debug.Log("[도감] 게임 종료 요청으로 인해 도감 해금 데이터가 리셋되었습니다.");
+    }
+    public void SaveGameData()
+    {
+        if (currentScore > highScore) highScore = currentScore;
+
+        SaveData data = new SaveData();
+        data.savedScore = currentScore;
+        data.savedHighScore = highScore;
+        data.savedMaxHp = playerMaxHp;
+        data.savedAttack = playerAttack;
+        data.unlockedEvolutions = new List<string>(unlockedEvolutions);
+
+        string json = JsonUtility.ToJson(data, true);
+        File.WriteAllText(saveFilePath, json);
     }
 
-    public float GetPlayerMoveSpeed()
+    public void LoadGameData()
     {
-        return playerMoveSpeed;
-    }
+        if (File.Exists(saveFilePath))
+        {
+            string json = File.ReadAllText(saveFilePath);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-    public int GetPlayerHp()
-    {
-        return playerMaxHp;
-    }
-
-    public int GetPlayerAttack()
-    {
-        return playerAttack;
-    }
-
-    public void SaveGameResult()
-    {
-        Debug.Log($"[JSON 예비] 현재 점수 {currentScore}점으로 데이터 동기화 및 JSON 세이브 파일 기록 트리거.");
+            currentScore = data.savedScore;
+            highScore = data.savedHighScore;
+            playerMaxHp = data.savedMaxHp;
+            playerAttack = data.savedAttack;
+            if (data.unlockedEvolutions != null) unlockedEvolutions = data.unlockedEvolutions;
+        }
     }
 }

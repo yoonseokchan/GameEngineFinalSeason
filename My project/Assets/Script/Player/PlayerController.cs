@@ -4,13 +4,15 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Stats")]
-    public int playerMaxHP = 100;  
-    public int playerCurrentHP = 100;  
+    public int playerMaxHP = 100;
+    public int playerCurrentHP = 100;
     public int playerAttack = 0;
     public float moveSpeed = 1f;
 
     [Header("현재 진화 상태 정보")]
-    [SerializeField] private PlayerEvolutionSO currentEvolution;
+    [SerializeField] private PlayerEvolutionSO currentEvolutionData;
+    public PlayerEvolutionSO currentEvolution => currentEvolutionData;
+
     [SerializeField] private float frameTime = 0.15f;
 
     [Header("피격 내부 설정")]
@@ -27,17 +29,18 @@ public class PlayerController : MonoBehaviour
     private float timer = 0f;
 
     private float attackTimer = 0f;
-    private Vector2 lastMoveDirection = Vector2.down; 
+    private Vector2 lastMoveDirection = Vector2.down;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
 
-        if (currentEvolution != null)
+        if (currentEvolutionData != null)
         {
-            ApplyEvolution(currentEvolution);
+            ApplyEvolution(currentEvolutionData);
         }
+
         if (GameDataManager.Instance != null)
         {
             moveSpeed = GameDataManager.Instance.GetPlayerMoveSpeed();
@@ -65,14 +68,37 @@ public class PlayerController : MonoBehaviour
     {
         if (newEvolution == null) return;
 
-        currentEvolution = newEvolution;
+        currentEvolutionData = newEvolution;
+        if (GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.UnlockEvolution(currentEvolutionData.evolutionName);
+        }
 
-        playerAttack = (GameDataManager.Instance != null ? GameDataManager.Instance.GetPlayerAttack() : 10) + currentEvolution.attackBonus;
+        playerAttack = (GameDataManager.Instance != null ? GameDataManager.Instance.GetPlayerAttack() : 10) + currentEvolutionData.attackBonus;
 
-        currentSprites = currentEvolution.spriteDown;
+        currentSprites = currentEvolutionData.spriteDown;
         if (currentSprites != null && currentSprites.Length > 0) sr.sprite = currentSprites[0];
 
-        Debug.Log($"[{currentEvolution.evolutionName}] 형태로 변신 완료! 무기가 변경되었습니다.");
+        Debug.Log($"[{currentEvolutionData.evolutionName}] 형태로 변신 완료! 무기가 변경되었습니다.");
+    }
+    public void RefreshStatsFromManager()
+    {
+        if (GameDataManager.Instance != null)
+        {
+            int oldMax = playerMaxHP;
+            playerMaxHP = GameDataManager.Instance.GetPlayerHp();
+            playerCurrentHP += (playerMaxHP - oldMax); 
+
+            playerAttack = GameDataManager.Instance.GetPlayerAttack() + (currentEvolutionData != null ? currentEvolutionData.attackBonus : 0);
+
+            if (InGameUIManager.Instance != null)
+            {
+                InGameUIManager.Instance.InitializeHPBar(playerMaxHP);
+                InGameUIManager.Instance.UpdateHPBar(playerCurrentHP);
+            }
+
+            Debug.Log($"[강화 적용] 플레이어 스탯 갱신 완료! (체력: {playerCurrentHP}/{playerMaxHP}, 공격력: {playerAttack})");
+        }
     }
 
     public void OnMove(InputValue value)
@@ -82,17 +108,17 @@ public class PlayerController : MonoBehaviour
 
         if (input.sqrMagnitude > 0.01f)
         {
-            lastMoveDirection = input.normalized; 
+            lastMoveDirection = input.normalized;
 
             if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
             {
-                if (input.x > 0) ChangeSprites(currentEvolution.spriteRight);
-                else ChangeSprites(currentEvolution.spriteLeft);
+                if (input.x > 0) ChangeSprites(currentEvolutionData.spriteRight);
+                else ChangeSprites(currentEvolutionData.spriteLeft);
             }
             else
             {
-                if (input.y > 0) ChangeSprites(currentEvolution.spriteUp);
-                else ChangeSprites(currentEvolution.spriteDown);
+                if (input.y > 0) ChangeSprites(currentEvolutionData.spriteUp);
+                else ChangeSprites(currentEvolutionData.spriteDown);
             }
         }
     }
@@ -108,11 +134,11 @@ public class PlayerController : MonoBehaviour
 
     private void HandleAutoAttack()
     {
-        if (currentEvolution == null || currentEvolution.projectilePrefab == null) return;
+        if (currentEvolutionData == null || currentEvolutionData.projectilePrefab == null) return;
 
         attackTimer += Time.deltaTime;
 
-        if (attackTimer >= currentEvolution.attackCooldown)
+        if (attackTimer >= currentEvolutionData.attackCooldown)
         {
             FireProjectile();
             attackTimer = 0f;
@@ -121,13 +147,13 @@ public class PlayerController : MonoBehaviour
 
     private void FireProjectile()
     {
-        GameObject projGo = Instantiate(currentEvolution.projectilePrefab, transform.position, Quaternion.identity);
+        GameObject projGo = Instantiate(currentEvolutionData.projectilePrefab, transform.position, Quaternion.identity);
         Projectile projectile = projGo.GetComponent<Projectile>();
 
         if (projectile != null)
         {
             Vector2 targetDirection = GetDirectionToNearestEnemy();
-            projectile.Setup(playerAttack, currentEvolution.projectileSpeed, targetDirection, currentEvolution.knockbackForce);
+            projectile.Setup(playerAttack, currentEvolutionData.projectileSpeed, targetDirection, currentEvolutionData.knockbackForce);
         }
     }
 
@@ -207,13 +233,12 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        
         if (collision.CompareTag("Enemy") && dmgTimer <= 0f)
         {
             int damageTaken = 15;
 
             playerCurrentHP -= damageTaken;
-            dmgTimer = dmgCooldown; 
+            dmgTimer = dmgCooldown;
 
             Debug.Log($"플레이어 피격 감지! 남은 체력: {playerCurrentHP}/{playerMaxHP}");
 

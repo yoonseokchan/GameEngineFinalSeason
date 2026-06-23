@@ -5285,7 +5285,7 @@ MonoBehaviour:
   playerCurrentHP: 100
   playerAttack: 10
   moveSpeed: 0.5
-  currentEvolution: {fileID: 11400000, guid: 18920f5a829f69b4c854f9281a7df158, type: 2}
+  currentEvolutionData: {fileID: 11400000, guid: 18920f5a829f69b4c854f9281a7df158, type: 2}
   frameTime: 0.15
   dmgCooldown: 0.5
 --- !u!212 &537293813

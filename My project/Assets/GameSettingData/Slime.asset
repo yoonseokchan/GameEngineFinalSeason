@@ -13,9 +13,6 @@ MonoBehaviour:
   m_Name: Slime
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEvolutionSO
   evolutionName: Slime
-  hpBonus: 10
-  attackBonus: 10
-  speedBonus: 0.5
   spriteUp:
   - {fileID: 8078897041468352302, guid: 8e24bc22f7a6b9d4b9b1ce62bad835b8, type: 3}
   - {fileID: 6948402585382724860, guid: 9035aa74b70eee44f82b9647cbc54deb, type: 3}
@@ -28,7 +25,11 @@ MonoBehaviour:
   spriteRight:
   - {fileID: 5327261893239730755, guid: d78776c3a10c9d44eb63d5aa66182523, type: 3}
   - {fileID: -2431996629346840933, guid: f7b7886068645d14b9ee6693bd195a13, type: 3}
-  projectilePrefab: {fileID: 8329346128140360687, guid: 1d47f9d32d8de53428d6bf83cfad780f, type: 3}
+  attackBonus: 10
   attackCooldown: 4
+  projectilePrefab: {fileID: 8329346128140360687, guid: 1d47f9d32d8de53428d6bf83cfad780f, type: 3}
   projectileSpeed: 3
   knockbackForce: 1
+  nextEvolutions:
+  - {fileID: 11400000, guid: af1afd10813c2054f8ebb214b117710b, type: 2}
+  - {fileID: 11400000, guid: 7727591d62671e2458c33f10903bea65, type: 2}

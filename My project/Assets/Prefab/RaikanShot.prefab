@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6458134485134320300}
   - component: {fileID: 3070190902614854774}
   - component: {fileID: 6376837133146849015}
+  - component: {fileID: 8684235067817788049}
   m_Layer: 0
   m_Name: RaikanShot
   m_TagString: Untagged
@@ -151,3 +152,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 138d4f0befe62784aaa09c8345f86928, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
+--- !u!50 &8684235067817788049
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2504671515569021764}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
